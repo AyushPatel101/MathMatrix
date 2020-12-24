@@ -114,22 +114,9 @@ public class MathMatrix {
 	 *         MathMatrix.
 	 */
 	public MathMatrix add(MathMatrix rightHandSide) {
-		if (rightHandSide == null || rightHandSide.getNumRows() != getNumRows()
-				|| rightHandSide.getNumColumns() != getNumColumns())
-			throw new IllegalArgumentException(
-					"number of rows and/or columns are not equal for matricies");
-		// new 2D array so matricies aren't altered
-		int[][] newValues = new int[getNumRows()][getNumColumns()];
-		for (int r = 0; r < getNumRows(); r++) {
-			for (int c = 0; c < getNumColumns(); c++) {
-				// add the values at r and c for both matricies into newValues
-				newValues[r][c] = getVal(r, c) + rightHandSide.getVal(r, c);
-			}
-		}
-		// create new MathMatrix with 2D array
-		return new MathMatrix(newValues);
+		return changeMat(rightHandSide, (x,y)-> x + y);
 	}
-
+	
 	/**
 	 * implements MathMatrix subtraction, (this MathMatrix) - rightHandSide.
 	 * <br>
@@ -146,23 +133,35 @@ public class MathMatrix {
 	 *         number of columns in this MathMatrix.
 	 */
 	public MathMatrix subtract(MathMatrix rightHandSide) {
+		return changeMat(rightHandSide, (x,y)-> x - y);
+	}
+	
+	/* pre: rightHandSide rightHandSide.getNumRows() = getNumRows(),
+	 *                    rightHandSide.numCols() = getNumColumns()
+     * post: returns a new MathMatrix that is the result of (+/-) rightHandSide
+	 *         from this MathMatrix. The number of rows in the returned
+	 *         MathMatrix is equal to the number of rows in this MathMatrix. The
+	 *         number of columns in the returned MathMatrix is equal to the
+	 *         number of columns in this MathMatrix.
+	 */
+	// Adapted from Mike Scott - Topic 25 slides
+	private MathMatrix changeMat(MathMatrix rightHandSide, IntBinaryOperator operator) {
 		if (rightHandSide == null || rightHandSide.getNumRows() != getNumRows()
 				|| rightHandSide.getNumColumns() != getNumColumns())
 			throw new IllegalArgumentException(
 					"number of rows and/or columns are not equal for matricies");
-		// new 2D array so matricies aren't altered
 		int[][] newValues = new int[getNumRows()][getNumColumns()];
 		for (int r = 0; r < getNumRows(); r++) {
 			for (int c = 0; c < getNumColumns(); c++) {
-				// subtract the values at r and c for both matricies into
+				// subtract the values at r and c for both matrices into
 				// newValues
-				newValues[r][c] = getVal(r, c) - rightHandSide.getVal(r, c);
+				newValues[r][c] = operator.applyAsInt(getVal(r, c), rightHandSide.getVal(r, c));
 			}
 		}
 		// create new MathMatrix with 2D array
 		return new MathMatrix(newValues);
+		
 	}
-
 	/**
 	 * implements values multiplication, (this MathMatrix) * rightHandSide. <br>
 	 * pre: rightHandSide.getNumRows() = getNumColumns() <br>
